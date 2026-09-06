@@ -87,6 +87,14 @@
   .cand-item .cparty{font-size:14px;color:var(--muted);}
   .cand-item .cnumber{font-size:22px;font-weight:700;color:var(--accent-dark);}
 
+  .whatsapp-card{background:#e9f7ef;border:1px solid #bfe3cc;border-radius:12px;padding:26px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;}
+  .whatsapp-card .wtext{max-width:560px;}
+  .whatsapp-card h3{margin:0 0 6px;font-size:19px;color:var(--ink);}
+  .whatsapp-card p{margin:0;color:var(--muted);font-size:15px;}
+  .whatsapp-btn{display:inline-flex;align-items:center;gap:10px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 24px;border-radius:8px;white-space:nowrap;}
+  .whatsapp-btn:hover{background:#1fb457;}
+  .whatsapp-btn svg{width:22px;height:22px;fill:#fff;}
+
   .msg{font-size:14px;margin-top:12px;padding:10px 12px;border-radius:6px;}
   .msg.ok{background:#e4f0e9;color:var(--accent-dark);}
   .msg.err{background:#f6e4dd;color:var(--warn);}
@@ -102,6 +110,7 @@
         <h1 id="siteTitle">Um voto pelo Senado</h1>
         <p class="subtitle" id="siteDescription"></p>
         <div class="shortcuts">
+          <a href="#whatsapp-section">Entrar no grupo</a>
           <a href="#candidatos-section">Indicados pelo Flávio</a>
           <a href="#registrar-section">Consegui um voto</a>
         </div>
@@ -151,6 +160,20 @@
   </div>
 
   <div class="reminder">Lembre-se: nesta eleição, podemos votar em até 2 senadores.</div>
+
+  <section id="whatsapp-section">
+    <h2>Participe pelo WhatsApp</h2>
+    <div class="whatsapp-card">
+      <div class="wtext">
+        <h3>Entre em um de nossos grupos no WhatsApp</h3>
+        <p>Converse com outros voluntários, receba avisos e ajude a mobilizar mais um voto.</p>
+      </div>
+      <a class="whatsapp-btn" href="https://chat.whatsapp.com/GGDh6lAPNvW61txQ5NgAhw" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2m0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24a8.2 8.2 0 0 1 8.24 8.25c0 4.55-3.7 8.23-8.24 8.23m4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.17.24-.64.81-.78.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.42h-.48c-.16 0-.43.06-.65.31-.23.24-.85.83-.85 2.03s.87 2.36.99 2.52c.12.17 1.71 2.61 4.14 3.66.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.08.15-1.18-.06-.11-.23-.17-.48-.29"/></svg>
+        Entrar no grupo
+      </a>
+    </div>
+  </section>
 
   <section>
     <h2>Por estado</h2>
