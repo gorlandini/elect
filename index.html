@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Um voto pelo Senado</title>
+<style>
+  html{scroll-behavior:smooth;}
+  :root{
+    --green:#0f6b3f;
+    --green-dark:#0a4a2b;
+    --navy:#0a2c52;
+    --yellow:#f4c81a;
+    --card:#ffffff;
+    --line:#d9d5c7;
+    --accent:#f4c81a;
+    --accent-dark:#0f6b3f;
+    --warn:#b5502f;
+    --muted:#6b6a63;
+    --ink:#0a2c52;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:#f4f4f0;
+    color:var(--ink);
+    line-height:1.5;
+    font-size:17px;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 0 80px;}
+
+  .topbar{background:var(--green-dark);color:#fff;padding:22px 32px 30px;position:relative;overflow:hidden;}
+  .topbar::after{content:"";position:absolute;top:0;right:-40px;bottom:0;width:180px;background:var(--yellow);transform:skewX(-18deg);}
+  .topbar-inner{position:relative;z-index:1;max-width:960px;margin:0 auto;}
+  header h1{font-size:38px;font-weight:800;margin:0 0 12px;color:#fff;letter-spacing:-0.5px;}
+  .subtitle{color:#dbe7dd;font-size:17px;margin:0;max-width:680px;}
+
+  .shortcuts{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;}
+  .shortcuts a{display:inline-block;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.35);border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer;}
+  .shortcuts a:hover{background:rgba(255,255,255,0.22);}
+
+  .senate-graphic{margin:18px auto 0;display:flex;justify-content:center;}
+  .senate-graphic svg{width:100%;max-width:420px;height:auto;}
+
+  .content-pad{padding:0 32px;}
+
+  .hero{background:var(--navy);color:#fff;padding:34px 30px;margin:24px 0 12px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:24px;}
+  .hero .num{font-size:60px;font-weight:800;line-height:1;color:var(--yellow);}
+  .hero .label{font-size:16px;color:#cfd6c9;margin-top:8px;}
+
+  .countdown{text-align:right;}
+  .countdown-item{margin-bottom:10px;}
+  .countdown-item:last-child{margin-bottom:0;}
+  .countdown-num{font-size:30px;font-weight:800;color:#fff;line-height:1;}
+  .countdown-label{font-size:13px;color:#cfd6c9;margin-top:2px;}
+
+  .reminder{background:#fdf3d6;border:1px solid #ecd58a;color:#6b4e0a;border-radius:10px;padding:14px 18px;font-size:15px;margin:0 0 32px;}
+
+  .progress-wrap{background:var(--navy);padding:0 30px 30px;margin:0 0 32px;}
+  .progress-bar-track{background:rgba(255,255,255,0.15);border-radius:8px;height:14px;overflow:hidden;}
+  .progress-bar-fill{background:var(--yellow);height:100%;border-radius:8px;transition:width .4s ease;}
+  .progress-label{color:#cfd6c9;font-size:14px;margin-top:8px;}
+
+  section{margin-bottom:40px;}
+  h2{font-size:21px;font-weight:600;margin:0 0 18px;border-bottom:1px solid var(--line);padding-bottom:10px;}
+
+  .states{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+  .state-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;}
+  .state-card .name{font-size:15px;color:var(--muted);}
+  .state-card .count{font-size:28px;font-weight:600;margin-top:4px;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;}
+  label{display:block;font-size:15px;color:var(--muted);margin:18px 0 7px;}
+  label:first-of-type{margin-top:0;}
+  .fieldhint{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.4;}
+  input,select{width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:8px;font-size:17px;background:#fff;color:var(--ink);}
+  input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  button{margin-top:22px;width:100%;padding:16px;border:none;border-radius:8px;background:var(--green);color:#fff;font-size:17px;font-weight:600;cursor:pointer;}
+  button:hover{background:var(--green-dark);}
+  button:disabled{opacity:0.6;cursor:default;}
+
+  .cand-item{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);}
+  .cand-item:last-child{border-bottom:none;}
+  .cand-item .cname{font-weight:600;font-size:17px;}
+  .cand-item .cparty{font-size:14px;color:var(--muted);}
+  .cand-item .cnumber{font-size:22px;font-weight:700;color:var(--accent-dark);}
+
+  .msg{font-size:14px;margin-top:12px;padding:10px 12px;border-radius:6px;}
+  .msg.ok{background:#e4f0e9;color:var(--accent-dark);}
+  .msg.err{background:#f6e4dd;color:var(--warn);}
+  .empty{color:var(--muted);font-size:15px;padding:8px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <header>
+        <h1 id="siteTitle">Um voto pelo Senado</h1>
+        <p class="subtitle" id="siteDescription"></p>
+        <div class="shortcuts">
+          <a href="#candidatos-section">Indicados pelo Flávio</a>
+          <a href="#registrar-section">Consegui um voto</a>
+        </div>
+      </header>
+      <div class="senate-graphic">
+        <svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="120" width="420" height="8" fill="#dbe7dd"/>
+          <rect x="20" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <rect x="50" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <rect x="80" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <rect x="110" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <rect x="140" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <rect x="266" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <rect x="296" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <rect x="326" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <rect x="356" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <rect x="386" y="60" width="14" height="60" fill="#dbe7dd"/>
+          <polygon points="10,60 200,10 410,60" fill="#dbe7dd"/>
+          <circle cx="200" cy="45" r="16" fill="none" stroke="#f4c81a" stroke-width="4"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-pad">
+
+  <div class="hero">
+    <div>
+      <div class="num" id="totalCount">0</div>
+      <div class="label">votos confirmados no total</div>
+    </div>
+    <div class="countdown">
+      <div class="countdown-item">
+        <div class="countdown-num" id="daysFirstRound">–</div>
+        <div class="countdown-label">dias para o 1º turno</div>
+      </div>
+      <div class="countdown-item">
+        <div class="countdown-num" id="daysSecondRound">–</div>
+        <div class="countdown-label">dias para o 2º turno</div>
+      </div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel"></div>
+  </div>
+
+  <div class="reminder">Lembre-se: nesta eleição, podemos votar em até 2 senadores.</div>
+
+  <section>
+    <h2>Por estado</h2>
+    <div class="states" id="statesGrid"></div>
+  </section>
+
+  <section id="candidatos-section">
+    <h2>Candidatos indicados pelo Flávio</h2>
+    <div class="card">
+      <label for="candState">Escolha seu estado</label>
+      <select id="candState"></select>
+      <div id="candList" style="margin-top:18px;"></div>
+    </div>
+  </section>
+
+  <section id="registrar-section">
+    <h2>Registrar um voto conquistado</h2>
+    <div class="card">
+      <label for="fVolunteer">Seu nome ou apelido</label>
+      <input id="fVolunteer" type="text" placeholder="Não precisa ser o nome completo" maxlength="40">
+      <div class="fieldhint">Pode usar só o primeiro nome ou um apelido — não é necessário identificação completa.</div>
+
+      <label for="fState">Estado</label>
+      <select id="fState"></select>
+
+      <label for="fNote">Referência de quem confirmou o voto (opcional)</label>
+      <input id="fNote" type="text" placeholder="Ex: primeiro nome, iniciais ou vínculo (ex: vizinho)" maxlength="60">
+      <div class="fieldhint">Não coloque nome completo dessa pessoa — o objetivo é só ter uma referência, preservando a privacidade dela.</div>
+
+      <button id="submitBtn">Registrar voto</button>
+      <div id="formMsg"></div>
+    </div>
+  </section>
+
+  </div>
+</div>
+
+<script>
+const ESTADOS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+let candidatosCache = {};
+
+const PRIMEIRO_TURNO = new Date('2026-10-04T00:00:00-03:00');
+const SEGUNDO_TURNO = new Date('2026-10-25T00:00:00-03:00');
+
+function renderCountdown(){
+  const now = new Date();
+  const msPerDay = 24 * 60 * 60 * 1000;
+
+  const d1 = Math.ceil((PRIMEIRO_TURNO - now) / msPerDay);
+  const d2 = Math.ceil((SEGUNDO_TURNO - now) / msPerDay);
+
+  document.getElementById('daysFirstRound').textContent = d1 > 0 ? d1 : (d1 === 0 ? 'Hoje' : 'Encerrado');
+  document.getElementById('daysSecondRound').textContent = d2 > 0 ? d2 : (d2 === 0 ? 'Hoje' : 'Encerrado');
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function populateSelects(){
+  const fState = document.getElementById('fState');
+  const candState = document.getElementById('candState');
+  ESTADOS.forEach(uf => {
+    const o1 = document.createElement('option');
+    o1.value = uf; o1.textContent = uf;
+    fState.appendChild(o1);
+    const o2 = document.createElement('option');
+    o2.value = uf; o2.textContent = uf;
+    candState.appendChild(o2);
+  });
+}
+
+async function loadSettings(){
+  try{
+    const res = await fetch('/api/settings');
+    const s = await res.json();
+    if(s.title) document.getElementById('siteTitle').textContent = s.title;
+    if(s.description) document.getElementById('siteDescription').textContent = s.description;
+    document.title = s.title || document.title;
+    return s;
+  }catch(e){
+    return {};
+  }
+}
+
+async function loadCandidates(){
+  try{
+    const res = await fetch('/api/candidates');
+    candidatosCache = await res.json();
+  }catch(e){
+    candidatosCache = {};
+  }
+  renderCandidates();
+}
+
+function renderCandidates(){
+  const uf = document.getElementById('candState').value;
+  const list = document.getElementById('candList');
+  const candidatos = candidatosCache[uf] || [];
+
+  if(candidatos.length === 0){
+    list.innerHTML = '<div class="empty">Nenhum candidato indicado para ' + uf + '.</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  candidatos.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'cand-item';
+    row.innerHTML =
+      '<div><div class="cname">' + escapeHtml(c.name) + '</div><div class="cparty">' + escapeHtml(c.party) + '</div></div>' +
+      '<div class="cnumber">' + c.number + '</div>';
+    list.appendChild(row);
+  });
+}
+
+async function loadVotes(goal){
+  try{
+    const res = await fetch('/api/votes');
+    const data = await res.json();
+    renderVotes(data, goal);
+  }catch(e){
+    document.getElementById('statesGrid').innerHTML = '<div class="empty">Não foi possível carregar os dados agora.</div>';
+  }
+}
+
+function renderVotes(data, goal){
+  document.getElementById('totalCount').textContent = data.total || 0;
+
+  const g = parseInt(goal, 10) || 0;
+  const pct = g > 0 ? Math.min(100, Math.round((data.total / g) * 100)) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = g > 0
+    ? data.total.toLocaleString('pt-BR') + ' de ' + g.toLocaleString('pt-BR') + ' votos (' + pct + '%)'
+    : '';
+
+  const grid = document.getElementById('statesGrid');
+  grid.innerHTML = '';
+  const sorted = [...ESTADOS].sort((a,b) => (data.counts[b]||0) - (data.counts[a]||0));
+  sorted.forEach(uf => {
+    const div = document.createElement('div');
+    div.className = 'state-card';
+    div.innerHTML = '<div class="name">' + uf + '</div><div class="count">' + (data.counts[uf] || 0) + '</div>';
+    grid.appendChild(div);
+  });
+}
+
+document.getElementById('candState').addEventListener('change', renderCandidates);
+
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  const volunteer = document.getElementById('fVolunteer').value.trim();
+  const state = document.getElementById('fState').value;
+  const note = document.getElementById('fNote').value.trim();
+  const msg = document.getElementById('formMsg');
+  const btn = document.getElementById('submitBtn');
+
+  if(!volunteer){
+    msg.className = 'msg err';
+    msg.textContent = 'Informe seu nome antes de enviar.';
+    return;
+  }
+
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Enviando...';
+
+  try{
+    const res = await fetch('/api/votes', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ state, volunteer, note })
+    });
+    const data = await res.json();
+
+    if(!res.ok){
+      msg.className = 'msg err';
+      msg.textContent = data.error || 'Não foi possível registrar o voto.';
+    } else {
+      msg.className = 'msg ok';
+      msg.textContent = 'Voto registrado. Obrigado por participar!';
+      document.getElementById('fVolunteer').value = '';
+      document.getElementById('fNote').value = '';
+      init();
+    }
+  }catch(e){
+    msg.className = 'msg err';
+    msg.textContent = 'Erro de conexão. Tente novamente.';
+  }
+
+  btn.disabled = false;
+  btn.textContent = original;
+});
+
+async function init(){
+  const settings = await loadSettings();
+  await loadVotes(settings.goal);
+}
+
+populateSelects();
+loadCandidates();
+renderCountdown();
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Um voto pelo Senado</title>
+<style>
+  :root{
+    --ink:#0a2c52;
+    --card:#ffffff;
+    --line:#d9d5c7;
+    --green:#0f6b3f;
+    --green-dark:#0a4a2b;
+    --muted:#6b6a63;
+    --warn:#b5502f;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f4f0;color:var(--ink);line-height:1.5;}
+  .wrap{max-width:640px;margin:0 auto;padding:40px 24px 80px;}
+  h1{font-size:26px;font-weight:700;margin:0 0 24px;}
+  h2{font-size:16px;font-weight:600;margin:32px 0 14px;border-bottom:1px solid var(--line);padding-bottom:8px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;}
+  label{display:block;font-size:14px;color:var(--muted);margin:16px 0 6px;}
+  label:first-of-type{margin-top:0;}
+  input,textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:8px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink);}
+  textarea{resize:vertical;min-height:80px;}
+  button{margin-top:20px;width:100%;padding:14px;border:none;border-radius:8px;background:var(--green);color:#fff;font-size:15px;font-weight:600;cursor:pointer;}
+  button:hover{background:var(--green-dark);}
+  .msg{font-size:14px;margin-top:12px;padding:10px 12px;border-radius:6px;}
+  .msg.ok{background:#e4f0e9;color:var(--green-dark);}
+  .msg.err{background:#f6e4dd;color:var(--warn);}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  #panel{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Painel administrativo</h1>
+
+  <div id="loginBox" class="card">
+    <label for="pw">Senha de administrador</label>
+    <input id="pw" type="password" placeholder="Digite a senha">
+    <button id="loginBtn">Entrar</button>
+    <div id="loginMsg"></div>
+  </div>
+
+  <div id="panel">
+    <div class="card">
+      <h2 style="margin-top:0;">Inicializar banco de dados</h2>
+      <p style="font-size:14px;color:var(--muted);margin-top:0;">Rode isso uma única vez, logo após o primeiro deploy. Cria as tabelas e insere os estados, candidatos e configurações padrão. Rodar de novo não apaga dados já existentes.</p>
+      <button id="seedBtn">Inicializar / verificar banco</button>
+      <div id="seedMsg"></div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h2 style="margin-top:0;">Meta e textos do site</h2>
+
+      <label for="fGoal">Meta de votos</label>
+      <input id="fGoal" type="number" min="0">
+
+      <label for="fTitle">Título do site</label>
+      <input id="fTitle" type="text">
+
+      <label for="fDescription">Texto de descrição</label>
+      <textarea id="fDescription"></textarea>
+
+      <h2>Rate limit (proteção contra bots)</h2>
+      <div class="row3">
+        <div>
+          <label for="fMax">Envios máx.</label>
+          <input id="fMax" type="number" min="1">
+        </div>
+        <div>
+          <label for="fWindow">Janela (min)</label>
+          <input id="fWindow" type="number" min="1">
+        </div>
+        <div>
+          <label for="fGap">Intervalo mín. (s)</label>
+          <input id="fGap" type="number" min="1">
+        </div>
+      </div>
+
+      <button id="saveBtn">Salvar alterações</button>
+      <div id="saveMsg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let adminSecret = null;
+
+async function login(){
+  const pw = document.getElementById('pw').value;
+  const msg = document.getElementById('loginMsg');
+  try{
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json();
+    if(res.ok){
+      adminSecret = pw;
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('panel').style.display = 'block';
+      await loadSettings();
+    } else {
+      msg.className = 'msg err';
+      msg.textContent = data.error || 'Senha incorreta.';
+    }
+  }catch(e){
+    msg.className = 'msg err';
+    msg.textContent = 'Erro de conexão.';
+  }
+}
+
+async function loadSettings(){
+  try{
+    const res = await fetch('/api/admin/settings', {
+      headers: { 'x-admin-secret': adminSecret }
+    });
+    const s = await res.json();
+    document.getElementById('fGoal').value = s.goal || '';
+    document.getElementById('fTitle').value = s.title || '';
+    document.getElementById('fDescription').value = s.description || '';
+    document.getElementById('fMax').value = s.rate_limit_max || '';
+    document.getElementById('fWindow').value = s.rate_limit_window_minutes || '';
+    document.getElementById('fGap').value = s.min_gap_seconds || '';
+  }catch(e){}
+}
+
+async function saveSettings(){
+  const msg = document.getElementById('saveMsg');
+  const body = {
+    goal: document.getElementById('fGoal').value,
+    title: document.getElementById('fTitle').value,
+    description: document.getElementById('fDescription').value,
+    rate_limit_max: document.getElementById('fMax').value,
+    rate_limit_window_minutes: document.getElementById('fWindow').value,
+    min_gap_seconds: document.getElementById('fGap').value
+  };
+  try{
+    const res = await fetch('/api/admin/settings', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'x-admin-secret': adminSecret},
+      body: JSON.stringify(body)
+    });
+    if(res.ok){
+      msg.className = 'msg ok';
+      msg.textContent = 'Alterações salvas.';
+    } else {
+      const data = await res.json();
+      msg.className = 'msg err';
+      msg.textContent = data.error || 'Não foi possível salvar.';
+    }
+  }catch(e){
+    msg.className = 'msg err';
+    msg.textContent = 'Erro de conexão.';
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', login);
+document.getElementById('saveBtn').addEventListener('click', saveSettings);
+
+document.getElementById('seedBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('seedBtn');
+  const msg = document.getElementById('seedMsg');
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Inicializando...';
+
+  try{
+    const res = await fetch('/api/admin/seed', {
+      method: 'POST',
+      headers: { 'x-admin-secret': adminSecret }
+    });
+    const data = await res.json();
+    if(res.ok){
+      msg.className = 'msg ok';
+      msg.textContent = (data.log || []).join(' ');
+      await loadSettings();
+    } else {
+      msg.className = 'msg err';
+      msg.textContent = data.error || 'Não foi possível inicializar.';
+    }
+  }catch(e){
+    msg.className = 'msg err';
+    msg.textContent = 'Erro de conexão.';
+  }
+
+  btn.disabled = false;
+  btn.textContent = original;
+});
+</script>
+</body>
+</html>
