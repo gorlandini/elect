@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
   }
 
   const db = getDb();
-  const result = await db.execute("SELECT key, value FROM settings WHERE key IN ('title','description','goal')");
+  const result = await db.execute("SELECT key, value FROM settings WHERE key IN ('title','description','goal','progress_label','first_round_date','second_round_date')");
 
   const settings = {};
   for (const row of result.rows) {

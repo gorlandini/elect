@@ -44,6 +44,9 @@ const DEFAULT_SETTINGS = {
   title: "Um voto pelo Senado",
   description: "Eleger Flávio Bolsonaro não basta — precisamos de um Senado forte o suficiente para levar adiante o impeachment de Alexandre de Moraes. O compromisso desta campanha é simples: cada pessoa aqui se compromete a conversar com um amigo ou familiar e conquistar um voto a mais para esse objetivo.",
   goal: "10000",
+  progress_label: "Meta dos próximos 3 dias",
+  first_round_date: "2026-10-04",
+  second_round_date: "2026-10-25",
   rate_limit_max: "5",
   rate_limit_window_minutes: "60",
   min_gap_seconds: "8"

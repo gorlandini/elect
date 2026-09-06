@@ -64,6 +64,20 @@
       <label for="fDescription">Texto de descrição</label>
       <textarea id="fDescription"></textarea>
 
+      <label for="fProgressLabel">Frase acima da barra de progresso</label>
+      <input id="fProgressLabel" type="text" placeholder="Ex: Meta dos próximos 3 dias">
+
+      <div class="row3" style="grid-template-columns:1fr 1fr;">
+        <div>
+          <label for="fFirstRound">Data do 1º turno</label>
+          <input id="fFirstRound" type="date">
+        </div>
+        <div>
+          <label for="fSecondRound">Data do 2º turno</label>
+          <input id="fSecondRound" type="date">
+        </div>
+      </div>
+
       <h2>Rate limit (proteção contra bots)</h2>
       <div class="row3">
         <div>
@@ -89,6 +103,14 @@
 <script>
 let adminSecret = null;
 
+async function safeParseJson(res){
+  try{
+    return await res.json();
+  }catch(e){
+    return null;
+  }
+}
+
 async function login(){
   const pw = document.getElementById('pw').value;
   const msg = document.getElementById('loginMsg');
@@ -98,7 +120,7 @@ async function login(){
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ password: pw })
     });
-    const data = await res.json();
+    const data = await safeParseJson(res);
     if(res.ok){
       adminSecret = pw;
       document.getElementById('loginBox').style.display = 'none';
@@ -106,11 +128,11 @@ async function login(){
       await loadSettings();
     } else {
       msg.className = 'msg err';
-      msg.textContent = data.error || 'Senha incorreta.';
+      msg.textContent = (data && data.error) || ('Erro ' + res.status + ' ao entrar.');
     }
   }catch(e){
     msg.className = 'msg err';
-    msg.textContent = 'Erro de conexão.';
+    msg.textContent = 'Erro de conexão: ' + e.message;
   }
 }
 
@@ -123,6 +145,9 @@ async function loadSettings(){
     document.getElementById('fGoal').value = s.goal || '';
     document.getElementById('fTitle').value = s.title || '';
     document.getElementById('fDescription').value = s.description || '';
+    document.getElementById('fProgressLabel').value = s.progress_label || '';
+    document.getElementById('fFirstRound').value = s.first_round_date || '';
+    document.getElementById('fSecondRound').value = s.second_round_date || '';
     document.getElementById('fMax').value = s.rate_limit_max || '';
     document.getElementById('fWindow').value = s.rate_limit_window_minutes || '';
     document.getElementById('fGap').value = s.min_gap_seconds || '';
@@ -135,6 +160,9 @@ async function saveSettings(){
     goal: document.getElementById('fGoal').value,
     title: document.getElementById('fTitle').value,
     description: document.getElementById('fDescription').value,
+    progress_label: document.getElementById('fProgressLabel').value,
+    first_round_date: document.getElementById('fFirstRound').value,
+    second_round_date: document.getElementById('fSecondRound').value,
     rate_limit_max: document.getElementById('fMax').value,
     rate_limit_window_minutes: document.getElementById('fWindow').value,
     min_gap_seconds: document.getElementById('fGap').value
@@ -145,17 +173,17 @@ async function saveSettings(){
       headers: {'Content-Type':'application/json', 'x-admin-secret': adminSecret},
       body: JSON.stringify(body)
     });
+    const data = await safeParseJson(res);
     if(res.ok){
       msg.className = 'msg ok';
       msg.textContent = 'Alterações salvas.';
     } else {
-      const data = await res.json();
       msg.className = 'msg err';
-      msg.textContent = data.error || 'Não foi possível salvar.';
+      msg.textContent = (data && data.error) || ('Erro ' + res.status + ' ao salvar.');
     }
   }catch(e){
     msg.className = 'msg err';
-    msg.textContent = 'Erro de conexão.';
+    msg.textContent = 'Erro de conexão: ' + e.message;
   }
 }
 

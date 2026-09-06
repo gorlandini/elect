@@ -61,6 +61,7 @@
   .progress-bar-track{background:rgba(255,255,255,0.15);border-radius:8px;height:14px;overflow:hidden;}
   .progress-bar-fill{background:var(--yellow);height:100%;border-radius:8px;transition:width .4s ease;}
   .progress-label{color:#cfd6c9;font-size:14px;margin-top:8px;}
+  .progress-title{color:#fff;font-size:15px;font-weight:600;margin-bottom:10px;}
 
   section{margin-bottom:40px;}
   h2{font-size:21px;font-weight:600;margin:0 0 18px;border-bottom:1px solid var(--line);padding-bottom:10px;}
@@ -144,6 +145,7 @@
     </div>
   </div>
   <div class="progress-wrap">
+    <div class="progress-title" id="progressTitle"></div>
     <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
     <div class="progress-label" id="progressLabel"></div>
   </div>
@@ -190,18 +192,27 @@
 const ESTADOS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 let candidatosCache = {};
 
-const PRIMEIRO_TURNO = new Date('2026-10-04T00:00:00-03:00');
-const SEGUNDO_TURNO = new Date('2026-10-25T00:00:00-03:00');
-
-function renderCountdown(){
+function renderCountdown(settings){
   const now = new Date();
   const msPerDay = 24 * 60 * 60 * 1000;
 
-  const d1 = Math.ceil((PRIMEIRO_TURNO - now) / msPerDay);
-  const d2 = Math.ceil((SEGUNDO_TURNO - now) / msPerDay);
+  const d1Str = settings.first_round_date;
+  const d2Str = settings.second_round_date;
 
-  document.getElementById('daysFirstRound').textContent = d1 > 0 ? d1 : (d1 === 0 ? 'Hoje' : 'Encerrado');
-  document.getElementById('daysSecondRound').textContent = d2 > 0 ? d2 : (d2 === 0 ? 'Hoje' : 'Encerrado');
+  if(!d1Str && !d2Str){
+    document.getElementById('daysFirstRound').textContent = '–';
+    document.getElementById('daysSecondRound').textContent = '–';
+    return;
+  }
+
+  if(d1Str){
+    const d1 = Math.ceil((new Date(d1Str + 'T00:00:00-03:00') - now) / msPerDay);
+    document.getElementById('daysFirstRound').textContent = d1 > 0 ? d1 : (d1 === 0 ? 'Hoje' : 'Encerrado');
+  }
+  if(d2Str){
+    const d2 = Math.ceil((new Date(d2Str + 'T00:00:00-03:00') - now) / msPerDay);
+    document.getElementById('daysSecondRound').textContent = d2 > 0 ? d2 : (d2 === 0 ? 'Hoje' : 'Encerrado');
+  }
 }
 
 function escapeHtml(str){
@@ -229,6 +240,7 @@ async function loadSettings(){
     const s = await res.json();
     if(s.title) document.getElementById('siteTitle').textContent = s.title;
     if(s.description) document.getElementById('siteDescription').textContent = s.description;
+    document.getElementById('progressTitle').textContent = s.progress_label || '';
     document.title = s.title || document.title;
     return s;
   }catch(e){
@@ -347,11 +359,11 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
 async function init(){
   const settings = await loadSettings();
   await loadVotes(settings.goal);
+  renderCountdown(settings);
 }
 
 populateSelects();
 loadCandidates();
-renderCountdown();
 init();
 </script>
 </body>

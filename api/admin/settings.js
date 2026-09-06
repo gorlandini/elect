@@ -1,7 +1,7 @@
 const { getDb } = require('../../lib/db');
 const { isAdminAuthorized } = require('../../lib/utils');
 
-const EDITABLE_KEYS = ['title', 'description', 'goal', 'rate_limit_max', 'rate_limit_window_minutes', 'min_gap_seconds'];
+const EDITABLE_KEYS = ['title', 'description', 'goal', 'progress_label', 'first_round_date', 'second_round_date', 'rate_limit_max', 'rate_limit_window_minutes', 'min_gap_seconds'];
 
 module.exports = async (req, res) => {
   if (!isAdminAuthorized(req)) {
