@@ -385,15 +385,14 @@ async function init(){
   renderCountdown(settings);
 }
 
-// Contador de visitantes (não usa o banco de dados do projeto).
-// Usa o CountAPI (serviço externo e gratuito) para persistir a contagem,
-// já que funções serverless na Vercel não têm disco persistente.
+// Contador de visitantes: usa a tabela "settings" que já existe no banco
+// (chave "visit_count"), sem criar tabela nova nem tocar em vote_counts.
 // "uvps_visited" evita contar a mesma pessoa várias vezes na mesma sessão do navegador.
 async function trackVisit(){
   try{
     if(sessionStorage.getItem('uvps_visited')) return;
     sessionStorage.setItem('uvps_visited', '1');
-    await fetch('https://api.countapi.xyz/hit/umvotopelosenado2026/visitantes');
+    await fetch('/api/track-visit', { method: 'POST' });
   }catch(e){
     // Falha silenciosa: contador é informativo, não pode quebrar o site.
   }

@@ -132,7 +132,6 @@ async function login(){
       document.getElementById('loginBox').style.display = 'none';
       document.getElementById('panel').style.display = 'block';
       await loadSettings();
-      await loadVisitCount();
     } else {
       msg.className = 'msg err';
       msg.textContent = (data && data.error) || ('Erro ' + res.status + ' ao entrar.');
@@ -140,17 +139,6 @@ async function login(){
   }catch(e){
     msg.className = 'msg err';
     msg.textContent = 'Erro de conexão: ' + e.message;
-  }
-}
-
-async function loadVisitCount(){
-  const el = document.getElementById('visitCount');
-  try{
-    const res = await fetch('https://api.countapi.xyz/get/umvotopelosenado2026/visitantes');
-    const data = await res.json();
-    el.textContent = (data.value || 0).toLocaleString('pt-BR');
-  }catch(e){
-    el.textContent = '–';
   }
 }
 
@@ -169,6 +157,7 @@ async function loadSettings(){
     document.getElementById('fMax').value = s.rate_limit_max || '';
     document.getElementById('fWindow').value = s.rate_limit_window_minutes || '';
     document.getElementById('fGap').value = s.min_gap_seconds || '';
+    document.getElementById('visitCount').textContent = (parseInt(s.visit_count, 10) || 0).toLocaleString('pt-BR');
   }catch(e){}
 }
 
