@@ -53,6 +53,12 @@
     </div>
 
     <div class="card" style="margin-top:24px;">
+      <h2 style="margin-top:0;">Visitantes (a partir de hoje)</h2>
+      <div id="visitCount" style="font-size:40px;font-weight:800;">–</div>
+      <p style="font-size:13px;color:var(--muted);margin:8px 0 0;">Contagem aproximada de visitas (1 por sessão de navegador), via serviço externo (CountAPI). Não usa o banco de dados do projeto.</p>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
       <h2 style="margin-top:0;">Meta e textos do site</h2>
 
       <label for="fGoal">Meta de votos</label>
@@ -126,6 +132,7 @@ async function login(){
       document.getElementById('loginBox').style.display = 'none';
       document.getElementById('panel').style.display = 'block';
       await loadSettings();
+      await loadVisitCount();
     } else {
       msg.className = 'msg err';
       msg.textContent = (data && data.error) || ('Erro ' + res.status + ' ao entrar.');
@@ -133,6 +140,17 @@ async function login(){
   }catch(e){
     msg.className = 'msg err';
     msg.textContent = 'Erro de conexão: ' + e.message;
+  }
+}
+
+async function loadVisitCount(){
+  const el = document.getElementById('visitCount');
+  try{
+    const res = await fetch('https://api.countapi.xyz/get/umvotopelosenado2026/visitantes');
+    const data = await res.json();
+    el.textContent = (data.value || 0).toLocaleString('pt-BR');
+  }catch(e){
+    el.textContent = '–';
   }
 }
 
