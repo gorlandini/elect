@@ -84,11 +84,6 @@
   button:hover{background:var(--green-dark);}
   button:disabled{opacity:0.6;cursor:default;}
 
-  .cand-item{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);}
-  .cand-item:last-child{border-bottom:none;}
-  .cand-item .cname{font-weight:600;font-size:17px;}
-  .cand-item .cparty{font-size:14px;color:var(--muted);}
-  .cand-item .cnumber{font-size:22px;font-weight:700;color:var(--accent-dark);}
 
   .whatsapp-card{background:#e9f7ef;border:1px solid #bfe3cc;border-radius:12px;padding:26px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;}
   .whatsapp-card .wtext{max-width:560px;}
@@ -114,7 +109,6 @@
         <p class="subtitle" id="siteDescription"></p>
         <div class="shortcuts">
           <a href="#whatsapp-section">Entrar no grupo</a>
-          <a href="#candidatos-section">Indicados pelo Flávio</a>
           <a href="#registrar-section">Consegui um voto</a>
           <a href="#meta-hoje">Meta de Hoje</a>
           <a href="Modelo2.docx">Modelo de Folheto</a>
@@ -191,15 +185,6 @@
     <div class="states" id="statesGrid"></div>
   </section>
 
-  <section id="candidatos-section">
-    <h2>Candidatos indicados pelo Flávio</h2>
-    <div class="card">
-      <label for="candState">Escolha seu estado</label>
-      <select id="candState"></select>
-      <div id="candList" style="margin-top:18px;"></div>
-    </div>
-  </section>
-
   <section id="registrar-section">
     <h2>Registrar um voto conquistado</h2>
     <div class="card">
@@ -268,7 +253,6 @@
 
 <script>
 const ESTADOS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
-let candidatosCache = {};
 
 function renderCountdown(settings){
   const now = new Date();
@@ -301,14 +285,10 @@ function escapeHtml(str){
 
 function populateSelects(){
   const fState = document.getElementById('fState');
-  const candState = document.getElementById('candState');
   ESTADOS.forEach(uf => {
     const o1 = document.createElement('option');
     o1.value = uf; o1.textContent = uf;
     fState.appendChild(o1);
-    const o2 = document.createElement('option');
-    o2.value = uf; o2.textContent = uf;
-    candState.appendChild(o2);
   });
 }
 
@@ -324,37 +304,6 @@ async function loadSettings(){
   }catch(e){
     return {};
   }
-}
-
-async function loadCandidates(){
-  try{
-    const res = await fetch('/api/candidates');
-    candidatosCache = await res.json();
-  }catch(e){
-    candidatosCache = {};
-  }
-  renderCandidates();
-}
-
-function renderCandidates(){
-  const uf = document.getElementById('candState').value;
-  const list = document.getElementById('candList');
-  const candidatos = candidatosCache[uf] || [];
-
-  if(candidatos.length === 0){
-    list.innerHTML = '<div class="empty">Nenhum candidato indicado para ' + uf + '.</div>';
-    return;
-  }
-
-  list.innerHTML = '';
-  candidatos.forEach(c => {
-    const row = document.createElement('div');
-    row.className = 'cand-item';
-    row.innerHTML =
-      '<div><div class="cname">' + escapeHtml(c.name) + '</div><div class="cparty">' + escapeHtml(c.party) + '</div></div>' +
-      '<div class="cnumber">' + c.number + '</div>';
-    list.appendChild(row);
-  });
 }
 
 async function loadVotes(goal){
@@ -387,8 +336,6 @@ function renderVotes(data, goal){
     grid.appendChild(div);
   });
 }
-
-document.getElementById('candState').addEventListener('change', renderCandidates);
 
 document.getElementById('submitBtn').addEventListener('click', async () => {
   const volunteer = document.getElementById('fVolunteer').value.trim();
@@ -454,7 +401,6 @@ async function trackVisit(){
 }
 
 populateSelects();
-loadCandidates();
 init();
 trackVisit();
 </script>
