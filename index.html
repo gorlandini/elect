@@ -45,6 +45,20 @@
 
   .content-pad{padding:0 32px;}
 
+  .celebrate{position:relative;overflow:hidden;margin:24px 0 0;padding:34px 28px;border-radius:14px;text-align:center;
+    background:linear-gradient(135deg,var(--green) 0%,var(--green-dark) 55%,var(--navy) 100%);border:4px solid var(--yellow);
+    box-shadow:0 10px 30px rgba(10,44,82,.25);}
+  .celebrate .burst{font-size:42px;line-height:1;margin-bottom:10px;}
+  .celebrate .headline{font-size:clamp(26px,4.6vw,44px);font-weight:900;line-height:1.1;color:var(--yellow);margin:0 0 14px;
+    letter-spacing:-.5px;text-shadow:0 3px 0 rgba(0,0,0,.25);animation:pulse 1.8s ease-in-out infinite;}
+  .celebrate .body{font-size:clamp(17px,2.4vw,22px);font-weight:800;color:#fff;margin:0 auto;max-width:820px;line-height:1.35;}
+  .celebrate .body strong{color:var(--yellow);}
+  .celebrate .soon{display:inline-block;margin-top:18px;background:var(--yellow);color:var(--navy);font-weight:900;font-size:16px;
+    padding:8px 18px;border-radius:999px;letter-spacing:.5px;}
+  .confetti{position:absolute;top:-20px;width:10px;height:16px;opacity:.9;animation:fall linear infinite;}
+  @keyframes fall{to{transform:translateY(420px) rotate(540deg);}}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+  @media (prefers-reduced-motion:reduce){.celebrate .headline,.confetti{animation:none;}.confetti{display:none;}}
   .news-figure{margin:24px 0 0;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
   .news-figure img{display:block;width:100%;height:auto;}
   .news-figure figcaption{font-size:13px;color:var(--muted);padding:8px 14px;}
@@ -136,6 +150,25 @@
   </div>
 
   <div class="content-pad">
+
+  <div class="celebrate" role="status">
+    <span class="confetti" aria-hidden="true" style="left:4%;background:#f4c81a;animation-duration:3.0s;animation-delay:0.00s"></span>
+    <span class="confetti" aria-hidden="true" style="left:12%;background:#ffffff;animation-duration:3.7s;animation-delay:0.45s"></span>
+    <span class="confetti" aria-hidden="true" style="left:20%;background:#25D366;animation-duration:4.4s;animation-delay:0.90s"></span>
+    <span class="confetti" aria-hidden="true" style="left:28%;background:#f4c81a;animation-duration:5.1s;animation-delay:1.35s"></span>
+    <span class="confetti" aria-hidden="true" style="left:36%;background:#ffffff;animation-duration:3.0s;animation-delay:1.80s"></span>
+    <span class="confetti" aria-hidden="true" style="left:44%;background:#f4c81a;animation-duration:3.7s;animation-delay:2.25s"></span>
+    <span class="confetti" aria-hidden="true" style="left:52%;background:#25D366;animation-duration:4.4s;animation-delay:2.70s"></span>
+    <span class="confetti" aria-hidden="true" style="left:60%;background:#ffffff;animation-duration:5.1s;animation-delay:0.15s"></span>
+    <span class="confetti" aria-hidden="true" style="left:68%;background:#f4c81a;animation-duration:3.0s;animation-delay:0.60s"></span>
+    <span class="confetti" aria-hidden="true" style="left:76%;background:#ffffff;animation-duration:3.7s;animation-delay:1.05s"></span>
+    <span class="confetti" aria-hidden="true" style="left:84%;background:#25D366;animation-duration:4.4s;animation-delay:1.50s"></span>
+    <span class="confetti" aria-hidden="true" style="left:92%;background:#f4c81a;animation-duration:5.1s;animation-delay:1.95s"></span>
+    <div class="burst" aria-hidden="true">🎉🇧🇷🎉</div>
+    <p class="headline">NOSSO OBJETIVO FOI CONQUISTADO COM SUCESSO!!!!</p>
+    <p class="body">PARABÉNS À TODOS QUE TOPARAM FAZER PARTE DESTA BATALHA.<br>AGORA, VAMOS COM FORÇA PARA ELEGER <strong>FLÁVIO BOLSONARO</strong>.</p>
+    <div class="soon">EM BREVE NOVAS AÇÕES</div>
+  </div>
 
   <figure class="news-figure">
     <img src="img/senado-2027.png" alt="Senado será dominado pela direita a partir de 2027: 54 senadores eleitos no 1º turno — 19 pró-Lula, 2 flutuantes e 33 de oposição" loading="lazy">
